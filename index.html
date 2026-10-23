@@ -1,0 +1,941 @@
+
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monday Night Date 🍽️</title>
+
+  <style>
+    :root {
+      --bg: #0b0b12;
+      --panel: #151521;
+      --panel2: #1e1e2e;
+      --text: #f8f7ff;
+      --muted: #a5a3bd;
+      --purple: #9b72ff;
+      --pink: #ff70bd;
+      --green: #70f0b5;
+      --border: #303047;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top left, #281547 0%, transparent 40%),
+        radial-gradient(ellipse at bottom right, #40172f 0%, transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 560px;
+      background: rgba(21, 21, 33, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      padding: 25px;
+      box-shadow: 0 20px 80px #0008, 0 0 35px #9b72ff12;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: 800;
+      color: #d8c8ff;
+    }
+
+    .badge {
+      border: 1px solid #59447c;
+      color: #d9c9ff;
+      background: #281d3d;
+      border-radius: 30px;
+      padding: 7px 11px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .progress-track {
+      height: 5px;
+      background: #303044;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 25%;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      border-radius: inherit;
+      transition: width 0.3s ease;
+    }
+
+    .screen {
+      display: none;
+      animation: appear 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .eyebrow {
+      color: var(--pink);
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(27px, 6vw, 38px);
+      line-height: 1.12;
+      margin: 0 0 14px;
+      letter-spacing: -1px;
+    }
+
+    h2 {
+      font-size: 27px;
+      margin: 0 0 12px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .question {
+      margin-bottom: 25px;
+    }
+
+    .button-stack {
+      display: grid;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .choice {
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 17px;
+      color: var(--text);
+      background: var(--panel2);
+      font-weight: 800;
+      transition: background 0.2s, border-color 0.2s,
+        transform 0.2s, opacity 0.2s;
+    }
+
+    .choice:hover {
+      border-color: var(--purple);
+      background: #29233c;
+    }
+
+    .choice.primary {
+      color: white;
+      border: none;
+      background: linear-gradient(110deg, #8053ed, #d44fa5);
+      box-shadow: 0 8px 25px #9b72ff24;
+    }
+
+    .choice.primary:hover {
+      filter: brightness(1.12);
+    }
+
+    .choice:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .hint {
+      border: 1px solid #373047;
+      background: #201a2b;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #d5c6f5;
+      margin-top: 17px;
+      line-height: 1.5;
+    }
+
+    /* RESTAURANT AREA */
+    .restaurant-area {
+      position: relative;
+      min-height: 280px;
+      margin-top: 22px;
+      padding: 15px;
+      border-radius: 20px;
+      border: 1px solid #343048;
+      background:
+        radial-gradient(ellipse at center, #29203e 0%, #171522 75%);
+      overflow: hidden;
+    }
+
+    .restaurant-label {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      margin: 0 0 14px;
+      text-align: center;
+    }
+
+    .restaurant-options {
+      min-height: 225px;
+      display: flex;
+      align-content: center;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .restaurant-btn {
+      flex: 0 1 auto;
+      max-width: 100%;
+      border: 1px solid #51436f;
+      background: #242035;
+      color: white;
+      border-radius: 14px;
+      padding: 15px 13px;
+      font-weight: 800;
+      font-size: 13px;
+      line-height: 1.3;
+      box-shadow: 0 5px 15px #0003;
+      transition:
+        transform 0.25s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease;
+      animation: popin 0.25s ease;
+    }
+
+    .restaurant-btn:nth-child(odd) {
+      transform: rotate(-2deg);
+    }
+
+    .restaurant-btn:nth-child(even) {
+      transform: rotate(2deg);
+    }
+
+    .restaurant-btn:hover {
+      border-color: var(--pink);
+      background: #39274b;
+      transform: scale(1.05) rotate(0deg);
+    }
+
+    .restaurant-btn.moving {
+      animation: move-pop 0.35s ease;
+    }
+
+    @keyframes move-pop {
+      0% { transform: scale(0.85) rotate(-5deg); }
+      50% { transform: scale(1.08) rotate(4deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes popin {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .restaurant-btn.selected {
+      background: linear-gradient(120deg, #6544b8, #b63e88);
+      border-color: #f4b4ff;
+      box-shadow: 0 0 25px #ba69ff45;
+    }
+
+    .restaurant-btn.confirmed {
+      opacity: 0.38;
+      filter: grayscale(0.5);
+    }
+
+    .restaurant-status {
+      margin-top: 14px;
+      padding: 13px;
+      background: #11111b;
+      border: 1px solid #302a40;
+      border-radius: 12px;
+      color: #d7cafa;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.5;
+      min-height: 43px;
+    }
+
+    .selected-restaurant {
+      display: none;
+      margin-top: 16px;
+      text-align: center;
+      padding: 15px;
+      border: 1px solid #4e3d6a;
+      background: #221b30;
+      border-radius: 15px;
+    }
+
+    .selected-restaurant.show {
+      display: block;
+      animation: appear 0.3s ease;
+    }
+
+    .selected-restaurant strong {
+      display: block;
+      color: var(--green);
+      font-size: 20px;
+      margin-top: 7px;
+    }
+
+    .navigation {
+      display: flex;
+      gap: 10px;
+      margin-top: 23px;
+    }
+
+    .navigation button {
+      flex: 1;
+    }
+
+    .secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: #d8d5e9;
+      border-radius: 13px;
+      padding: 14px;
+      font-weight: 700;
+    }
+
+    .secondary:hover {
+      background: #252337;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 11px;
+      margin-top: 23px;
+    }
+
+    .time-btn {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 17px 8px;
+      color: white;
+      background: #202030;
+      font-size: 16px;
+      font-weight: 800;
+      transition: 0.2s;
+    }
+
+    .time-btn:hover,
+    .time-btn.selected {
+      border-color: var(--pink);
+      background: #39223e;
+      box-shadow: 0 0 18px #ff70bd17;
+    }
+
+    .summary {
+      border: 1px solid #403453;
+      background: #1d1929;
+      padding: 18px;
+      border-radius: 17px;
+      margin-top: 22px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #363043;
+      font-size: 13px;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-row span:first-child {
+      color: var(--muted);
+    }
+
+    .summary-row strong {
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .final-message {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .final-emoji {
+      font-size: 55px;
+      margin: 15px 0;
+    }
+
+    .final-quote {
+      margin-top: 20px;
+      border: 1px solid #4b3563;
+      background: #251b34;
+      color: #f4d8ff;
+      padding: 19px;
+      border-radius: 16px;
+      font-size: 17px;
+      line-height: 1.5;
+      font-weight: 900;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translate(-50%, 20px);
+      background: #f8f5ff;
+      color: #171320;
+      border-radius: 12px;
+      padding: 13px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 30px #0006;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.25s;
+      width: max-content;
+      max-width: calc(100vw - 35px);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: #77748f;
+    }
+
+    @media (max-width: 420px) {
+      .app {
+        padding: 19px;
+        border-radius: 21px;
+      }
+
+      .restaurant-area {
+        padding: 10px;
+      }
+
+      .restaurant-options {
+        gap: 9px;
+      }
+
+      .restaurant-btn {
+        font-size: 12px;
+        padding: 13px 10px;
+      }
+
+      .time-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="brand">✦ MONDAY NIGHT PLANS</div>
+      <div class="badge">VERY IMPORTANT MEETING</div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- SCREEN 1 -->
+    <section class="screen active" id="screen1">
+      <div class="eyebrow">QUESTION NO. 01</div>
+      <div class="question">
+        <h1>SINU ANG MANLILIBRE SA LUNES NG GABI?</h1>
+        <p>Pag-isipan nang mabuti. Ang sagot mo ay may malaking epekto sa ekonomiya ng inyong bulsa. 😌</p>
+      </div>
+
+      <div class="button-stack">
+        <button class="choice primary" id="jellyBtn" onclick="chooseJelly()">
+          JELLY 💅
+        </button>
+        <button class="choice" id="carloBtn" onclick="shrinkCarlo()">
+          CARLO 🥹
+        </button>
+      </div>
+
+      <div class="hint" id="firstHint">
+        💡 Pumili ng sagot. Walang pressure... pero may consequences.
+      </div>
+    </section>
+
+    <!-- SCREEN 2 -->
+    <section class="screen" id="screen2">
+      <div class="eyebrow">QUESTION NO. 02</div>
+      <h1>SAAN TAYO KAKAIN? 🍽️</h1>
+      <p>
+        Pindutin ang restaurant na gusto mo. Yung ibang choices, kailangan mong hulihin nang tatlong beses. Good luck. 😈
+      </p>
+
+      <div class="restaurant-area">
+        <div class="restaurant-label">CHOOSE YOUR DESTINY</div>
+
+        <div class="restaurant-options" id="restaurantOptions">
+          <button class="restaurant-btn" data-restaurant="JABE"
+            onclick="restaurantClick('JABE', this)">
+            🍔 JABE
+          </button>
+
+          <button class="restaurant-btn" data-restaurant="MCDO"
+            onclick="restaurantClick('MCDO', this)">
+            🍟 MCDO
+          </button>
+
+          <button class="restaurant-btn" data-restaurant="SAMG"
+            onclick="restaurantClick('SAMG', this)">
+            🥓 SAMG
+          </button>
+
+          <button class="restaurant-btn" data-restaurant="AMERICAN RIBS AND WINGS"
+            onclick="restaurantClick('AMERICAN RIBS AND WINGS', this)">
+            🍗 AMERICAN RIBS AND WINGS
+          </button>
+        </div>
+      </div>
+
+      <div class="restaurant-status" id="restaurantStatus" aria-live="polite">
+        Wala pang napipili. Pindutin ang isang restaurant! 👀
+      </div>
+
+      <div class="selected-restaurant" id="selectedRestaurant">
+        RESTAURANT SELECTED:
+        <strong id="selectedRestaurantName"></strong>
+        <p>Desisyon mo 'yan ha. Bawal magreklamo. 😂</p>
+      </div>
+
+      <div class="navigation">
+        <button class="secondary" onclick="goToScreen(1)">← BACK</button>
+        <button class="choice primary" id="restaurantNext"
+          onclick="goToTime()" disabled>
+          NEXT →
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 3 -->
+    <section class="screen" id="screen3">
+      <div class="eyebrow">QUESTION NO. 03</div>
+      <h1>ANONG ORAS TAYO? 🕗</h1>
+      <p>Pili ka na. Huwag yung “kahit anong oras” tapos late naman. 😭</p>
+
+      <div class="time-grid">
+        <button class="time-btn" onclick="selectTime('8:00 PM', this)">8:00 PM</button>
+        <button class="time-btn" onclick="selectTime('8:30 PM', this)">8:30 PM</button>
+        <button class="time-btn" onclick="selectTime('9:00 PM', this)">9:00 PM</button>
+        <button class="time-btn" onclick="selectTime('9:30 PM', this)">9:30 PM</button>
+        <button class="time-btn" onclick="selectTime('10:00 PM', this)">10:00 PM</button>
+      </div>
+
+      <div class="hint" id="timeHint">
+        ⏰ Piliin ang oras na kaya mong panindigan.
+      </div>
+
+      <div class="navigation">
+        <button class="secondary" onclick="goToScreen(2)">← BACK</button>
+        <button class="choice primary" id="finishBtn"
+          onclick="finishPlan()" disabled>
+          FINAL ANSWER →
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 4 -->
+    <section class="screen" id="screen4">
+      <div class="final-message">
+        <div class="eyebrow">OFFICIAL DATE PLAN</div>
+        <div class="final-emoji">🥂💖🍟</div>
+        <h1>AYAN, MAY PLANO NA!</h1>
+        <p>Congratulations! Nakarating din tayo sa final answer.</p>
+      </div>
+
+      <div class="summary">
+        <div class="summary-row">
+          <span>💸 Manlilibre</span>
+          <strong>JELLY</strong>
+        </div>
+        <div class="summary-row">
+          <span>🍽️ Restaurant</span>
+          <strong id="finalRestaurant">—</strong>
+        </div>
+        <div class="summary-row">
+          <span>🕗 Oras</span>
+          <strong id="finalTime">—</strong>
+        </div>
+        <div class="summary-row">
+          <span>📅 Araw</span>
+          <strong>LUNES NG GABI</strong>
+        </div>
+      </div>
+
+      <div class="final-quote">
+        KAPAG DI MO GINAWA NO SS NG BBM AT NO ID DIN BLEEEEEE 😭😭😭
+      </div>
+
+      <p style="text-align:center; margin-top:18px;">
+        This is a legally unofficial, emotionally binding date plan.
+        Bawal umatras. Charot. 😂
+      </p>
+
+      <div class="button-stack">
+        <button class="choice primary" onclick="copyPlan()">
+          📋 COPY DATE PLAN
+        </button>
+        <button class="choice" onclick="restart()">
+          ↻ ULITIN NATIN
+        </button>
+      </div>
+    </section>
+
+    <div class="footer">MADE WITH ✦ QUESTIONABLE FINANCIAL DECISIONS</div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    let selectedRestaurant = "";
+    let selectedTime = "";
+
+    const restaurantClicks = {
+      "JABE": 0,
+      "MCDO": 0,
+      "AMERICAN RIBS AND WINGS": 0
+    };
+
+    const restaurantMessages = {
+      "JABE": [
+        "JABE is playing hard to get. Click again! 😂",
+        "Isa pa! Hindi pa siya kumbinsido. 😭"
+      ],
+      "MCDO": [
+        "I'm lovin' it... pero habulin mo muna! 🍟",
+        "MCDO escaped! One more try. 🏃"
+      ],
+      "AMERICAN RIBS AND WINGS": [
+        "Tumakbo ang manok! Habulin mo ulit. 🍗",
+        "Malapit na! Isa pang click. 😂"
+      ]
+    };
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    function goToScreen(number) {
+      document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+      });
+
+      document.getElementById("screen" + number).classList.add("active");
+
+      document.getElementById("progress").style.width =
+        (number * 25) + "%";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function chooseJelly() {
+      showToast("Tamang sagot! Alam na this. 💅");
+      setTimeout(() => goToScreen(2), 400);
+    }
+
+    let carloClicks = 0;
+
+    function shrinkCarlo() {
+      const button = document.getElementById("carloBtn");
+      const hint = document.getElementById("firstHint");
+
+      carloClicks++;
+
+      const currentScale = Math.max(0, 1 - carloClicks * 0.17);
+      button.style.transform = "scale(" + currentScale + ")";
+      button.style.opacity = String(currentScale);
+      hint.textContent = "CARLO button is disappearing... baka JELLY na lang? 👀";
+
+      if (carloClicks >= 6) {
+        button.style.display = "none";
+        hint.textContent = "Wala na ang CARLO. JELLY na ang sagot. 😂";
+      }
+    }
+
+    function shuffleRestaurantButtons(clickedButton) {
+      const container = document.getElementById("restaurantOptions");
+      const buttons = Array.from(
+        container.querySelectorAll(".restaurant-btn")
+      );
+
+      // Gumawa ng bagong random order para talagang magpalit ng puwesto.
+      let shuffled = buttons.slice();
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // Kung nagkataong pareho ang ayos, iikot ang listahan.
+      const sameOrder = shuffled.every((button, index) => {
+        return button === buttons[index];
+      });
+
+      if (sameOrder && shuffled.length > 1) {
+        shuffled.push(shuffled.shift());
+      }
+
+      // I-apply ang bagong ayos sa aktuwal na HTML elements.
+      shuffled.forEach(button => {
+        container.appendChild(button);
+      });
+
+      // Bigyan ng animation ang pinindot na restaurant.
+      buttons.forEach(button => button.classList.remove("moving"));
+      void clickedButton.offsetWidth;
+      clickedButton.classList.add("moving");
+
+      setTimeout(() => {
+        clickedButton.classList.remove("moving");
+      }, 400);
+    }
+
+    function restaurantClick(name, button) {
+      if (selectedRestaurant) {
+        showToast("May napili na! Pindutin ang NEXT. 😌");
+        return;
+      }
+
+      if (name === "SAMG") {
+        selectRestaurant(name);
+        return;
+      }
+
+      restaurantClicks[name]++;
+
+      if (restaurantClicks[name] >= 3) {
+        selectRestaurant(name);
+        return;
+      }
+
+      shuffleRestaurantButtons(button);
+
+      const message = restaurantMessages[name][
+        restaurantClicks[name] - 1
+      ];
+
+      document.getElementById("restaurantStatus").textContent =
+        message + " (" + restaurantClicks[name] + "/3)";
+
+      showToast(message);
+    }
+
+    function selectRestaurant(name) {
+      selectedRestaurant = name;
+
+      const buttons = document.querySelectorAll(".restaurant-btn");
+
+      buttons.forEach(button => {
+        const restaurant = button.dataset.restaurant;
+        button.classList.remove("selected");
+
+        if (restaurant === name) {
+          button.classList.add("selected");
+        } else {
+          button.classList.add("confirmed");
+        }
+      });
+
+      document.getElementById("restaurantStatus").textContent =
+        "FINAL ANSWER LOCKED IN. Desisyon mo 'yan! 😂";
+
+      document.getElementById("selectedRestaurantName").textContent = name;
+      document.getElementById("selectedRestaurant").classList.add("show");
+      document.getElementById("restaurantNext").disabled = false;
+
+      showToast("Selected: " + name + " 🎉");
+    }
+
+    function goToTime() {
+      if (!selectedRestaurant) {
+        showToast("Pumili muna ng restaurant! 🍽️");
+        return;
+      }
+
+      goToScreen(3);
+    }
+
+    function selectTime(time, button) {
+      selectedTime = time;
+
+      document.querySelectorAll(".time-btn").forEach(item => {
+        item.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+      document.getElementById("finishBtn").disabled = false;
+      document.getElementById("timeHint").textContent =
+        "Napili mo: " + time + ". Huwag kang male-late ha. 👀";
+
+      showToast("Oras selected: " + time);
+    }
+
+    function finishPlan() {
+      if (!selectedRestaurant || !selectedTime) {
+        showToast("Kumpletuhin muna ang choices! 😭");
+        return;
+      }
+
+      document.getElementById("finalRestaurant").textContent =
+        selectedRestaurant;
+
+      document.getElementById("finalTime").textContent = selectedTime;
+
+      goToScreen(4);
+    }
+
+    function restart() {
+      selectedRestaurant = "";
+      selectedTime = "";
+      carloClicks = 0;
+
+      Object.keys(restaurantClicks).forEach(name => {
+        restaurantClicks[name] = 0;
+      });
+
+      const carloButton = document.getElementById("carloBtn");
+      carloButton.style.display = "";
+      carloButton.style.transform = "";
+      carloButton.style.opacity = "";
+
+      document.getElementById("firstHint").textContent =
+        "💡 Pumili ng sagot. Walang pressure... pero may consequences.";
+
+      const container = document.getElementById("restaurantOptions");
+      const buttons = Array.from(
+        container.querySelectorAll(".restaurant-btn")
+      );
+
+      const originalOrder = [
+        "JABE",
+        "MCDO",
+        "SAMG",
+        "AMERICAN RIBS AND WINGS"
+      ];
+
+      originalOrder.forEach(name => {
+        const button = buttons.find(
+          item => item.dataset.restaurant === name
+        );
+        if (button) {
+          button.className = "restaurant-btn";
+          container.appendChild(button);
+        }
+      });
+
+      document.getElementById("restaurantStatus").textContent =
+        "Wala pang napipili. Pindutin ang isang restaurant! 👀";
+
+      document.getElementById("selectedRestaurant").classList.remove("show");
+      document.getElementById("restaurantNext").disabled = true;
+      document.getElementById("finishBtn").disabled = true;
+
+      document.querySelectorAll(".time-btn").forEach(button => {
+        button.classList.remove("selected");
+      });
+
+      goToScreen(1);
+      showToast("Reset! Round two. 😂");
+    }
+
+    async function copyPlan() {
+      const plan =
+        "MONDAY NIGHT DATE PLAN 💖\n" +
+        "Manlilibre: JELLY\n" +
+        "Restaurant: " + selectedRestaurant + "\n" +
+        "Oras: " + selectedTime + "\n" +
+        "Araw: LUNES NG GABI\n\n" +
+        "KAPAG DI MO GINAWA NO SS NG BBM AT NO ID DIN BLEEEEEE 😭";
+
+      try {
+        await navigator.clipboard.writeText(plan);
+        showToast("Na-copy na! I-send mo na. 💌");
+      } catch (error) {
+        const textArea = document.createElement("textarea");
+        textArea.value = plan;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        try {
+          document.execCommand("copy");
+          showToast("Na-copy na! I-send mo na. 💌");
+        } catch (copyError) {
+          showToast("Hindi na-copy automatically. Subukang piliin at kopyahin ang text.");
+        }
+
+        textArea.remove();
+      }
+    }
+  </script>
+</body>
+</html>
